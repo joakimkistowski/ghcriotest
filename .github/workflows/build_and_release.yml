@@ -1,0 +1,22 @@
+name: Build and Release GHCRIOtest
+env:
+  DOCKER_TAG_PREFIX: ghcr.io/joakimkistowski
+  DOCKER_IMAGE_NAME: ghcriotest
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+    - name: Build  Docker image
+      run: docker build . --tag ${{ env.DOCKER_TAG_PREFIX }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+      run: docker push ${{ env.DOCKER_TAG_PREFIX }}/${{ env.DOCKER_IMAGE_NAME }}:latest
